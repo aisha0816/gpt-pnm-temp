@@ -5,16 +5,12 @@ async function sendMessage() {
 
     if (!text) return;
 
-    // 1. Show your message in the chat
-    chatbox.innerHTML += `<div class="user-msg">${text}</div>`;
+    // 1. Show user message (using your original 'user' class)
+    chatbox.innerHTML += `<div class="user">${text}</div>`;
     input.value = "";
 
-    // Scroll to bottom
-    chatbox.scrollTop = chatbox.scrollHeight;
-
     try {
-        // 2. Talk to your Render Server
-        // Make sure this URL matches your Render dashboard!
+        // 2. Talk to Render
         const response = await fetch('https://gpt-pnm-temp.onrender.com/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -23,25 +19,16 @@ async function sendMessage() {
 
         const data = await response.json();
 
-        // 3. Show the Mentor's answer (Fixes the "undefined" error)
-        if (data.text) {
-            chatbox.innerHTML += `<div class="bot-msg">${data.text}</div>`;
+        // 3. Show the Mentor's answer (using your original 'bot' class)
+        if (data && data.text) {
+            chatbox.innerHTML += `<div class="bot">${data.text}</div>`;
         } else {
-            chatbox.innerHTML += `<div class="bot-msg">I heard you, but the response was empty.</div>`;
+            chatbox.innerHTML += `<div class="bot">I'm thinking... try sending that again!</div>`;
         }
 
     } catch (error) {
-        console.error("Error:", error);
-        chatbox.innerHTML += `<div class="bot-msg">The mentor is napping. Try again in 30 seconds!</div>`;
+        chatbox.innerHTML += `<div class="bot">The mentor is napping. Wake me up in 30 seconds!</div>`;
     }
 
-    // Scroll to bottom again
     chatbox.scrollTop = chatbox.scrollHeight;
 }
-
-// Allow pressing "Enter" to send
-document.getElementById("userInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        sendMessage();
-    }
-});
