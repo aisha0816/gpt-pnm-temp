@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+body {
+    /* Background using #F7F8F0 (Creamy White) */
+    background-color: #f7f8f0;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-container {
+    width: 95%;
+    max-width: 400px;
+    height: 85vh;
+    /* Main background #9CD5FF (Light Blue) */
+    background: rgba(156, 213, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid #7aaace;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(53, 88, 114, 0.1);
+    overflow: hidden;
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    /* Deep Navy #355872 */
+    color: #355872;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    background: white;
+    border-bottom: 1px solid #7aaace;
+}
+
+#chatbox {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* User Message - Medium Blue #7AAACE */
+.user {
+    align-self: flex-end;
+    background: #7aaace;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 18px 18px 4px 18px;
+    max-width: 80%;
+    font-size: 0.95rem;
+}
+
+/* Bot Message - Lightest Blue #9CD5FF or White */
+.bot {
+    align-self: flex-start;
+    background: white;
+    color: #355872;
+    padding: 12px 16px;
+    border-radius: 18px 18px 18px 4px;
+    max-width: 80%;
+    border: 1px solid #9cd5ff;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.input-area {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #7aaace;
+}
+
+#userInput {
+    flex: 1;
+    border: 1px solid #7aaace;
+    border-radius: 12px;
+    padding: 12px;
+    outline: none;
+    color: #355872;
+}
+
+button {
+    /* Deep Navy #355872 */
+    background: #355872;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #2a465b;
+    transform: translateY(-1px);
+}
