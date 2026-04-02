@@ -11,14 +11,15 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/chat', async (req, res) => {
     try {
-        // Use 1.5-flash as it is the most stable for the library right now
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // ✅ FIXED MODEL NAME
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash-latest" 
+        });
         
         const result = await model.generateContent(req.body.message);
         const response = await result.response;
         const text = response.text();
 
-        // LOGGING: This helps us see what's happening in Render Logs
         console.log("AI says:", text);
 
         if (!text) {
@@ -34,4 +35,8 @@ app.post('/chat', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server live on port ${PORT}`));
+
+// ✅ FIXED BACKTICKS HERE
+app.listen(PORT, function () {
+    console.log("Server live on port " + PORT);
+});
