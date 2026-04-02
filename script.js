@@ -1,38 +1,53 @@
 async function sendMessage() {
+    console.log("Send clicked"); // DEBUG
+
     const input = document.getElementById("userInput");
     const chatbox = document.getElementById("chatbox");
-    const text = input.value.trim();
 
+    if (!input || !chatbox) {
+        console.error("Missing elements");
+        return;
+    }
+
+    const text = input.value.trim();
     if (!text) return;
 
-    // 1. Show user message
-    chatbox.innerHTML += <div class="user">${text}</div>;
+    // Show user message safely
+    const userMsg = document.createElement("div");
+    userMsg.className = "user";
+    userMsg.innerText = text;
+    chatbox.appendChild(userMsg);
+
     input.value = "";
 
     try {
-        // 2. Talk to backend (Render)
         const response = await fetch('https://gpt-pnm-temp.onrender.com/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text }) 
+            body: JSON.stringify({ message: text })
         });
 
         const data = await response.json();
 
-        // 3. Show bot response
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot";
+
         if (data && data.text) {
-            chatbox.innerHTML += <div class="bot">${data.text}</div>;
+            botMsg.innerText = data.text;
         } else {
-            chatbox.innerHTML += <div class="bot">Hmm... I didn’t get that. Try again?</div>;
+            botMsg.innerText = "No response. Try again.";
         }
 
-    } catch (error) {
-        console.error("Frontend error:", error);
+        chatbox.appendChild(botMsg);
 
-        // Server down / sleeping
-        chatbox.innerHTML += <div class="bot">Server error. Please try again in a few seconds.</div>;
+    } catch (error) {
+        console.error("Fetch error:", error);
+
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot";
+        botMsg.innerText = "Server error. Try again in a few seconds.";
+        chatbox.appendChild(botMsg);
     }
 
-    // Auto scroll
     chatbox.scrollTop = chatbox.scrollHeight;
 }
