@@ -1,52 +1,44 @@
 async function sendMessage() {
-    console.log("Send clicked"); // DEBUG
+    console.log("🚀 Sending message...");
 
     const input = document.getElementById("userInput");
     const chatbox = document.getElementById("chatbox");
 
-    if (!input || !chatbox) {
-        console.error("Missing elements");
-        return;
-    }
-
     const text = input.value.trim();
     if (!text) return;
 
-    // Show user message safely
-    const userMsg = document.createElement("div");
-    userMsg.className = "user";
-    userMsg.innerText = text;
-    chatbox.appendChild(userMsg);
+    // Show user message
+    const userDiv = document.createElement("div");
+    userDiv.className = "user";
+    userDiv.innerText = text;
+    chatbox.appendChild(userDiv);
 
     input.value = "";
 
     try {
-        const response = await fetch('https://gpt-pnm-temp.onrender.com/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("https://gpt-pnm-temp.onrender.com/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ message: text })
         });
 
         const data = await response.json();
+        console.log("✅ Response:", data);
 
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot";
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot";
+        botDiv.innerText = data.text || "No response";
+        chatbox.appendChild(botDiv);
 
-        if (data && data.text) {
-            botMsg.innerText = data.text;
-        } else {
-            botMsg.innerText = "No response. Try again.";
-        }
+    } catch (err) {
+        console.error("❌ Fetch error:", err);
 
-        chatbox.appendChild(botMsg);
-
-    } catch (error) {
-        console.error("Fetch error:", error);
-
-        const botMsg = document.createElement("div");
-        botMsg.className = "bot";
-        botMsg.innerText = "Server error. Try again in a few seconds.";
-        chatbox.appendChild(botMsg);
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot";
+        botDiv.innerText = "Server error. Try again.";
+        chatbox.appendChild(botDiv);
     }
 
     chatbox.scrollTop = chatbox.scrollHeight;
