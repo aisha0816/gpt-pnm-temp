@@ -1,44 +1,33 @@
 async function sendMessage() {
-    console.log("🚀 Sending message...");
-
     const input = document.getElementById("userInput");
     const chatbox = document.getElementById("chatbox");
-
     const text = input.value.trim();
+
     if (!text) return;
 
-    // Show user message
-    const userDiv = document.createElement("div");
-    userDiv.className = "user";
-    userDiv.innerText = text;
-    chatbox.appendChild(userDiv);
-
+    // 1. Show user message
+    chatbox.innerHTML += `<div class="user">${text}</div>`;
     input.value = "";
 
     try {
-        const response = await fetch("https://gpt-pnm-temp.onrender.com/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: text })
+        // 2. Talk to Render
+        const response = await fetch('https://gpt-pnm-temp.onrender.com/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text }) 
         });
 
         const data = await response.json();
-        console.log("✅ Response:", data);
 
-        const botDiv = document.createElement("div");
-        botDiv.className = "bot";
-        botDiv.innerText = data.text || "No response";
-        chatbox.appendChild(botDiv);
+        // 3. Show the Mentor's answer or the specific error
+        if (data.text) {
+            chatbox.innerHTML += `<div class="bot">${data.text}</div>`;
+        } else if (data.error) {
+            chatbox.innerHTML += `<div class="bot">Error: ${data.details || data.error}</div>`;
+        }
 
-    } catch (err) {
-        console.error("❌ Fetch error:", err);
-
-        const botDiv = document.createElement("div");
-        botDiv.className = "bot";
-        botDiv.innerText = "Server error. Try again.";
-        chatbox.appendChild(botDiv);
+    } catch (error) {
+        chatbox.innerHTML += `<div class="bot">Cannot reach the server. Is Render 'Live'?</div>`;
     }
 
     chatbox.scrollTop = chatbox.scrollHeight;
