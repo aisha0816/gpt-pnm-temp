@@ -7,15 +7,13 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 
-// Initialize the Gemini AI
+// FORCE the version to v1 (Stable) instead of v1beta
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/chat', async (req, res) => {
     try {
-        // We use gemini-1.5-flash-latest to ensure we get the most stable one
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash-latest" 
-        });
+        // We use the most basic model name to avoid the 404
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
         
         const result = await model.generateContent(req.body.message);
         const response = await result.response;
@@ -29,8 +27,6 @@ app.post('/chat', async (req, res) => {
         
     } catch (error) {
         console.error("SERVER ERROR:", error.message);
-
-        // If it still says 404, it might be because of the region or API version
         res.status(500).json({ 
             error: "The brain is offline.", 
             details: error.message 
