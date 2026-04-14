@@ -14,7 +14,7 @@ app.post('/chat', async (req, res) => {
     try {
         // FIX: Using the 2026 workhorse model name
         // This model is the 'v1' version of the 2.5-flash you liked!
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         
         const result = await model.generateContent(req.body.message);
         const response = await result.response;
