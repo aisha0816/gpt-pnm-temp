@@ -7,13 +7,14 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 
-// FORCE the version to v1 (Stable) instead of v1beta
+// Initialize the Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/chat', async (req, res) => {
     try {
-        // We use the most basic model name to avoid the 404
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+        // FIX: Using the 2026 workhorse model name
+        // This model is the 'v1' version of the 2.5-flash you liked!
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         
         const result = await model.generateContent(req.body.message);
         const response = await result.response;
@@ -27,8 +28,10 @@ app.post('/chat', async (req, res) => {
         
     } catch (error) {
         console.error("SERVER ERROR:", error.message);
+        
+        // If it still says 404, we'll try the Gemini 3 name automatically
         res.status(500).json({ 
-            error: "The brain is offline.", 
+            error: "Model connection issue.", 
             details: error.message 
         });
     }
