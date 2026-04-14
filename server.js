@@ -7,40 +7,43 @@ const app = express();
 app.use(cors()); 
 app.use(express.json());
 
-// Initialize the API with your key from Render
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// 🛠️ HELPER FUNCTION: This waits and retries if Google is busy
+async function generateWithRetry(model, message, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const result = await model.generateContent(message);
+            const response = await result.response;
+            return response.text();
+        } catch (error) {
+            // If it's a 503 (Busy) or 429 (Quota), wait and try again
+            if (error.message.includes("503") || error.message.includes("429")) {
+                console.log(`Google is busy. Retry attempt ${i + 1}...`);
+                await new Promise(res => setTimeout(res, 2000 * (i + 1))); // Wait 2s, 4s, 6s...
+            } else {
+                throw error; // If it's a different error, stop immediately
+            }
+        }
+    }
+    throw new Error("Google is still overloaded after 3 tries.");
+}
 
 app.post('/chat', async (req, res) => {
     try {
-        // USE THIS EXACT NAME: gemini-2.5-flash
-        // This is the stable 2026 workhorse you wanted!
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         
-        const result = await model.generateContent(req.body.message);
-        const response = await result.response;
-        const text = response.text();
+        // 🚀 Call our new retry function
+        const text = await generateWithRetry(model, req.body.message);
 
-        if (text) {
-            res.json({ text: text });
-        } else {
-            res.status(500).json({ error: "Empty response from the AI." });
-        }
+        res.json({ text: text });
         
     } catch (error) {
-        console.error("SERVER ERROR:", error.message);
-
-        // This checks if Google is just busy (503/429) or if the model is wrong (404)
-        if (error.message.includes("404")) {
-            res.status(404).json({ 
-                error: "Model not found.", 
-                details: "Google renamed the model. Try 'gemini-2.5-flash' in server.js." 
-            });
-        } else {
-            res.status(500).json({ 
-                error: "The brain is offline.", 
-                details: error.message 
-            });
-        }
+        console.error("FINAL ERROR:", error.message);
+        res.status(500).json({ 
+            error: "The brain is overloaded.", 
+            details: "Google's 2.5-flash is at max capacity. Try again in 30 seconds!" 
+        });
     }
 });
 
