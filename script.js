@@ -19,9 +19,11 @@ async function sendMessage() {
 
         const data = await response.json();
 
-        // 3. Show the Mentor's answer or the specific error
+        // 3. Show the Mentor's answer with Formatting
         if (data.text) {
-            chatbox.innerHTML += `<div class="bot">${data.text}</div>`;
+            // Translate Markdown (**bold**, ##, etc.) to HTML
+            const formattedResponse = marked.parse(data.text);
+            chatbox.innerHTML += `<div class="bot">${formattedResponse}</div>`;
         } else if (data.error) {
             chatbox.innerHTML += `<div class="bot">Error: ${data.details || data.error}</div>`;
         }
