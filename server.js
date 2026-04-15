@@ -10,8 +10,9 @@ app.use(express.json());
 app.post('/chat', async (req, res) => {
     const apiKey = process.env.GEMINI_API_KEY;
     
-    // 🚀 MITIGATION: Switching back to the High-Capacity Stable Model
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 🚀 THE FIX: Use v1beta and gemini-2.5-flash
+    // This is the model that worked for us a few minutes ago!
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(url, {
@@ -24,22 +25,22 @@ app.post('/chat', async (req, res) => {
 
         const data = await response.json();
 
-        // Check if Google sent back the text
         if (data.candidates && data.candidates[0].content) {
             res.json({ text: data.candidates[0].content.parts[0].text });
         } else if (data.error) {
+            // This will show us if it's a Quota (429) or another 404
             console.error("GOOGLE ERROR:", data.error.message);
             res.status(data.error.code || 500).json({ 
-                error: "The brain is tired.", 
+                error: "Google Error", 
                 details: data.error.message 
             });
         } else {
-            res.status(500).json({ error: "Unexpected response from Google." });
+            res.status(500).json({ error: "No response from AI." });
         }
         
     } catch (error) {
-        console.error("SERVER CRASH:", error.message);
-        res.status(500).json({ error: "The brain is offline.", details: error.message });
+        console.error("SERVER ERROR:", error.message);
+        res.status(500).json({ error: "Server crashed.", details: error.message });
     }
 });
 
